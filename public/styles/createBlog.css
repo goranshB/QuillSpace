@@ -1,0 +1,131 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #1a1a1a;
+  color: #eee;
+  margin: 0;
+  padding: 0;
+}
+
+.editor-container {
+  max-width: 900px;
+  margin: 50px auto;
+  margin-top: 70px;
+  padding: 24px;
+  background: #2c2c2c;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.editor-container h1 {
+  text-align: center;
+  color: #0cfbbb;
+  margin-bottom: 20px;
+}
+
+.editor-container input[type="text"] {
+  width: 97%;
+  padding: 12px;
+  margin-bottom: 16px;
+  font-size: 1rem;
+  border: 1px solid #585858;
+  border-radius: 6px;
+  color: #dbdbdb;
+  background-color: #2c2c2c;
+}
+
+.editor-container input[type="file"] {
+  width:200px;
+  height: 20px;
+  margin-bottom: 20px;
+  background-color: transparent;
+  padding: 3px;
+  border-radius: 5px;
+  
+}
+
+.editor-container #ab{
+  color: #a6a6a6;
+  
+}
+
+#toolbar {
+  border: 1px solid #5b5b5b;
+  border-radius: 6px 6px 0 0;
+  margin-bottom: 0;
+  color: #0cfbbb;
+  background-color: #0bbd8d;
+}
+
+#editor {
+  height: 300px;
+  background: #2c2c2c;
+  border: 1px solid #5b5b5b;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  margin-bottom: 20px;
+}
+
+.ql-editor {
+  color: #b4b4b4;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+
+#blogpost button[type="submit"] {
+  display: block;
+  margin: 0 auto;
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #007acc;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: rgb(6, 93, 70);
+}
+
+#ab {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #a6a6a6;
+  font-weight: 500;
+}
+
+#thumbnail {
+  display: block;
+  font-size: 14px;
+  color: #ccc;
+  background-color: #2c2c2c;
+  border: 1px solid #444;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 400px;
+  cursor: pointer;
+}
+
+#thumbnail::-webkit-file-upload-button {
+  background: #007acc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#thumbnail::-webkit-file-upload-button:hover {
+  background: #065e52;
+}
+
+#content{
+  height: 95%;
+  width:93%;
+  background-color: #2c2c2c;
+  border-radius: 10px;
+  color: #eeeeee;
+  padding: 30px;
+}

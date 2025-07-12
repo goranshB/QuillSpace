@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<div class="edit-feed-profile">
+  <form class="profile-edit-box" action="/edit-profile" method="POST" enctype="multipart/form-data">
+    <div class="edit_p1">
+      <label for="profileImage">
+        <img id="edit-pic" src="<%= user.profile_picture || '/assets/default_profile.png' %>" alt="Profile Image">
+      </label>
+      <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display: none;">
+      <div>
+        <input type="text" name="username" value="<%= user.username %>" required />
+        <p>Followers: <%= user.followers || 'N/A' %></p>
+      </div>
+    </div>
+
+    <div id="edit_p2">
+      <textarea name="bio" placeholder="Enter your bio here..."><%= user.bio || '' %></textarea>
+    </div>
+    <div class id="edit_p3">
+        <input type="text" name="email" value="<%= user.email %>" required />
+    </div>
+
+    <button type="submit" class="save-btn">Save Changes</button>
+  </form>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const fileInput = document.getElementById("profileImage");
+    const previewImg = document.getElementById("edit-pic");
+
+    fileInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewImg.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

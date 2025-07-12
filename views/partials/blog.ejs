@@ -1,0 +1,22 @@
+<a href="/blog_page/<%= blog.id %>" class="blog-card-link">
+  <div class="blog-card">
+    <div class="thumbnail">
+      <img src="<%= blog.thumbnail || 'assets/placeholder.png' %>">
+    </div>
+    <div class="details">
+      <h2 class="title"><%= blog.title %></h2>
+      <p class="description">
+        <%= blog.discription.split(" ").slice(0, 25).join(" ") %>...
+      </p>
+      <div class="meta">
+        <p class="author">by <%= authorname||blog.username %></p>
+        <p class="date">Published: <%= new Date(blog.published).toLocaleDateString() %></p>
+      </div>
+      <% if (typeof showEdit !== "undefined" && showEdit) { %>
+        <div class="edit-btn-container">
+          <a href="/edit-blog/<%= blog.id %>" class="edit-btn">Edit</a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</a>

@@ -1,0 +1,13 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<div class="blog-feed">
+  <h1><%=type%></h1>
+  <% if (blogs) { %>
+    <% blogs.forEach(blog => { %>
+      <%- include("partials/blog", { blog: blog , authorname:null }) %>
+    <% }) %>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

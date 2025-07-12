@@ -1,0 +1,73 @@
+
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+<div class="feed-profile">
+<div class="blog-feed">
+    <h1>Your Blogs</h1>
+  <% if (blogs) { %>
+    <% blogs.forEach(blog => { %>
+      <%- include("partials/blog", { blog: blog, authorname:profileUser.username, showEdit: isOwnProfile}) %>
+    <% }) %>
+  <% } %>
+</div>
+
+
+
+<div class="profile-feed">
+    <div id="p_1">
+        <img id="pic" src="<%= profileUser.profile_picture || '/assets/default_profile.png' %>" alt="image">
+        <div> 
+            <h2><%= profileUser.username %></h2>
+            <p>Followers: <%= followerCount || "N/A" %></p>
+        </div>
+    </div>
+
+
+    <% if (isOwnProfile) { %>
+        <a id="editrpofilebtn" href="/p_edit">Edit Profile</a>
+    <% }%>
+    
+    <div id="follow">
+    <% if (!isOwnProfile) { %>
+        <button id="followBtn" data-following="<%= isFollowing %>" data-user-id="<%= profileUser.id %>">
+            <%= isFollowing ? "Following" : "Follow" %>
+        </button>
+    <% } %>
+    </div>
+
+
+    <div id="p_2">
+        <p><%= profileUser.bio || "No bio provided." %></p>
+    </div>
+</div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const followBtn = document.getElementById("followBtn");
+  if (!followBtn) return;
+
+  followBtn.addEventListener("click", async () => {
+    const userId = followBtn.dataset.userId;
+    const isFollowing = followBtn.dataset.following === "true";
+
+    const response = await fetch(`/${isFollowing ? 'unfollow' : 'follow'}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ followee_id: userId })
+    });
+
+    if (response.ok) {
+      followBtn.textContent = isFollowing ? "Follow" : "Following";
+      followBtn.dataset.following = (!isFollowing).toString();
+    } else {
+      alert("Failed to update follow status.");
+    }
+  });
+});
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,40 @@
+<nav class="navbar">
+  <div class="navbar-left">
+    <img id="logo" src="/assets/logo.png" alt="logo">
+     <!-- <h2>QuillSpace</h2> -->
+  </div>
+  <div class="navbar-center">
+    <form action="/search" method="get" class="search-wrapper">
+      <div class="search-wrapper">
+        <input type="text" name="query" placeholder="Search blogs..." />
+        <button type="submit">
+            <img src="/assets/icons/search.svg" alt="">
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="navbar-right">
+  <a class="icon" href="/create">
+    <img class="ic" src="/assets/icons/plus-circle.svg" alt="Add blog" />
+    <span class="tooltip-text">Create</span>
+  </a>
+  <a class="icon" href="/login">
+    <img class="ic" src="/assets/icons/box-arrow-in-right.svg" alt="Login" />
+    <span class="tooltip-text">Login</span>
+  </a>
+  <a class="icon" href="/profile/<%= currentUserId %>">
+    <img class="ic" src="/assets/icons/person-circle.svg" alt="Profile" />
+    <span class="tooltip-text">Profile</span>
+  </a>
+</div>
+
+</nav>
+<aside id="sidebar" class="sidebar hidden">
+  <a href="/home" class="sidebar-btn">Home</a>
+  <a href="/following" class="sidebar-btn">Following</a>
+  <a href="/trending" class="sidebar-btn">Trending</a>
+  <a href="/liked" class="sidebar-btn">Liked</a>
+  <a href="/bookmarks" class="sidebar-btn">Bookmarked</a>
+</aside>
+
