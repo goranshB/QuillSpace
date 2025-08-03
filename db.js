@@ -10,10 +10,27 @@
 // });
 
 // export default pool;
+//------------------------------------------------------------
+// import pkg from "pg";
+// import dns from "dns";
+
+// dns.setDefaultResultOrder('ipv4first');
+
+// const { Pool } = pkg;
+
+// const pool = new Pool({
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: { rejectUnauthorized: false },
+// });
+
+// export default pool;
+
+
+
+//------------------------------------------------------------
 
 import pkg from "pg";
 import dns from "dns";
-
 dns.setDefaultResultOrder('ipv4first');
 
 const { Pool } = pkg;
@@ -21,8 +38,7 @@ const { Pool } = pkg;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
+  max: 5
 });
 
 export default pool;
-
-
