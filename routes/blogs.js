@@ -1,21 +1,10 @@
 import express from "express";
 import pool from "../db.js";
 import multer from "multer";
-import path from "path";
-import fs from "fs";
+import { supabase } from "../utils/supabaseClient.js";
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads/");
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
-  },
-});
-
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
 
 const router = express.Router();
 
@@ -23,22 +12,91 @@ router.get("/create", (req, res) => res.render("create.ejs"));
 
 router.post("/newblogpost", upload.single("thumbnail"), async (req, res) => {
   const { title, discription, content } = req.body;
-  const thumbnailPath = "/uploads/" + req.file.filename;
   const authorId = req.session.userId || null;
+  let thumbnailPath = null;
+
   try {
-  await pool.query(
-    "INSERT INTO blogs (title, discription, content, thumbnail, author_id) VALUES ($1, $2, $3, $4, $5)",
-    [title, discription, content, thumbnailPath, authorId]
-  );
-  res.redirect("/home");
-} catch (err) {
+    if (req.file) {
+      const file = req.file;
+      const fileExt = file.originalname.split('.').pop();
+      const filePath = `blog-thumbnails/thumb_${Date.now()}.${fileExt}`;
 
-  console.error("💥 Blog insert error:", err);
-  res.status(500).send("Error saving blog.");
-}
+      const { error: uploadError } = await supabase.storage
+        .from('blog-assets')
+        .upload(filePath, file.buffer, {
+          contentType: file.mimetype,
+        });
 
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: urlData } = supabase.storage.from('blog-assets').getPublicUrl(filePath);
+      thumbnailPath = urlData.publicUrl;
+    }
+
+    await pool.query(
+      "INSERT INTO blogs (title, discription, content, thumbnail, author_id) VALUES ($1, $2, $3, $4, $5)",
+      [title, discription, content, thumbnailPath, authorId]
+    );
+
+    res.redirect("/home");
+  } catch (err) {
+    console.error("💥 Blog insert error:", err);
+    res.status(500).send("Error saving blog.");
+  }
 });
 
+router.post("/editblog/:id", upload.single("thumbnail"), async (req, res) => {
+  const blogId = req.params.id;
+  const { title, discription, content } = req.body;
+  const userId = req.session.userId;
+
+  try {
+    const blogResult = await pool.query("SELECT * FROM blogs WHERE id = $1", [blogId]);
+    if (blogResult.rows.length === 0 || blogResult.rows[0].author_id !== userId) {
+      return res.status(403).send("Unauthorized");
+    }
+
+    let newThumbnailUrl = blogResult.rows[0].thumbnail;
+
+    if (req.file) {
+      const oldImageUrl = blogResult.rows[0].thumbnail;
+
+      if (oldImageUrl && oldImageUrl.includes('supabase.co')) {
+        const oldImagePath = oldImageUrl.split('/blog-assets/')[1];
+        await supabase.storage.from('blog-assets').remove([oldImagePath]);
+      }
+
+      const file = req.file;
+      const fileExt = file.originalname.split('.').pop();
+      const newFilePath = `blog-thumbnails/thumb_${blogId}_${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('blog-assets')
+        .upload(newFilePath, file.buffer, {
+          contentType: file.mimetype,
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: urlData } = supabase.storage.from('blog-assets').getPublicUrl(newFilePath);
+      newThumbnailUrl = urlData.publicUrl;
+    }
+
+    await pool.query(
+      "UPDATE blogs SET title = $1, discription = $2, content = $3, thumbnail = $4 WHERE id = $5",
+      [title, discription, content, newThumbnailUrl, blogId]
+    );
+
+    res.redirect(`/blog_page/${blogId}`);
+  } catch (err) {
+    console.error("💥 Error editing blog:", err);
+    res.status(500).send("Failed to update blog");
+  }
+});
 
 router.get("/blog_page/:id", async (req, res) => {
   const blogId = req.params.id;
@@ -115,7 +173,6 @@ router.post("/like/:blogId", async (req, res) => {
       await pool.query("UPDATE blogs SET likes = likes - 1 WHERE id = $1", [blogId]);
       return res.json({ liked: false });
     } else {
-      // Like
       await pool.query("INSERT INTO likes (user_id, blog_id) VALUES ($1, $2)", [userId, blogId]);
       await pool.query("UPDATE blogs SET likes = likes + 1 WHERE id = $1", [blogId]);
       return res.json({ liked: true });
@@ -126,45 +183,6 @@ router.post("/like/:blogId", async (req, res) => {
   }
 });
 
-
-
-router.post("/editblog/:id", upload.single("thumbnail"), async (req, res) => {
-  const blogId = req.params.id;
-  const { title, discription, content } = req.body;
-  const userId = req.session.userId;
-
-  try {
-    const blog = await pool.query("SELECT * FROM blogs WHERE id = $1", [blogId]);
-    if (blog.rows.length === 0 || blog.rows[0].author_id !== userId) {
-      return res.status(403).send("Unauthorized");
-    }
-
-    let thumbnail = blog.rows[0].thumbnail;
-
-    if (req.file) {
-      if (thumbnail && !thumbnail.includes("default")) {
-        const oldPath = path.join("public", thumbnail);
-        fs.unlink(oldPath, (err) => {
-          if (err) console.error("Error deleting old thumbnail:", err);
-        });
-      }
-
-      thumbnail = "/uploads/" + req.file.filename;
-    }
-
-    await pool.query(
-      "UPDATE blogs SET title = $1, discription = $2, content = $3, thumbnail = $4 WHERE id = $5",
-      [title, discription, content, thumbnail, blogId]
-    );
-
-    res.redirect(`/blog_page/${blogId}`);
-  } catch (err) {
-    console.error("💥 Error editing blog:", err);
-    res.status(500).send("Failed to update blog");
-  }
-});
-
-
 router.get("/edit-blog/:id", async (req, res) => {
   const blogId = req.params.id;
   try {
@@ -173,7 +191,7 @@ router.get("/edit-blog/:id", async (req, res) => {
 
     if (blog.author_id !== req.session.userId) return res.status(403).send("Forbidden");
 
-    res.render("editBlog", {blog });
+    res.render("editBlog", { blog });
   } catch (err) {
     console.error(err);
     res.status(500).send("Error loading edit page.");
@@ -202,7 +220,6 @@ router.post("/comment/:id", async (req, res) => {
   }
 });
 
-
 router.post("/bookmark/:id", async (req, res) => {
   const blogId = req.params.id;
   const userId = req.session.userId;
@@ -228,6 +245,4 @@ router.post("/bookmark/:id", async (req, res) => {
   }
 });
 
-
 export default router;
-

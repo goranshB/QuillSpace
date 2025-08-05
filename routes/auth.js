@@ -7,7 +7,9 @@ const router = express.Router();
 
 router.get("/login", (req, res) => res.render("login.ejs"));
 router.get("/register", (req, res) => res.render("register.ejs"));
-
+router.get("/forgot_password",(req,res)=>{
+  res.render("forgot_password.ejs");
+});
 router.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -81,6 +83,21 @@ router.post("/verify-otp", (req, res) => {
   res.send("OTP verified");
 });
 
+router.post("/change_password",async(req,res)=>{
+  const {username,password,email}=req.body;
+  const result = await pool.query(`SELECT * FROM users WHERE eamil=$1`,[email]);
+  if(result.rows.length===0){
+    return res.status(500).send("Invalid email");
+  }
+  const user=result.rows[0];
+  if(username.length!==0){
+    pool.query(`ALTER TABLE users`)
+  }
+  if(password.length!==0){
+    pool.query(`ALTER TABLE users`)
+  }
+  
+});
 
 
 
