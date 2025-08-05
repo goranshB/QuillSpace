@@ -20,6 +20,36 @@ const pool = new Pool({
   ssl: {
     rejectUnauthorized: false
   }
+//------------------------------------------------------------
+// import pkg from "pg";
+// import dns from "dns";
+
+// dns.setDefaultResultOrder('ipv4first');
+
+// const { Pool } = pkg;
+
+// const pool = new Pool({
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: { rejectUnauthorized: false },
+// });
+
+// export default pool;
+
+
+
+//------------------------------------------------------------
+
+// import pkg from "pg";
+// import dns from "dns";
+// dns.setDefaultResultOrder('ipv4first');
+
+// const { Pool } = pkg;
+
+// const pool = new Pool({
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: { rejectUnauthorized: false },
+//   max: 5
+// >>>>>>> 86de4be815302ef3086122dd3f4be5109828a19c
 });
 
 export default pool;
