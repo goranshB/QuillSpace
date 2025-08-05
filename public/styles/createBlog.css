@@ -1,131 +1,179 @@
+:root {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2c2c2c;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a6a6a6;
+  --accent-primary: #0cfbbb;
+  --accent-primary-hover: #0bbd8d;
+  --border-color: #555;
+  --border-focus-color: var(--accent-primary);
+  --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #1a1a1a;
-  color: #eee;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   margin: 0;
-  padding: 0;
+  padding: 20px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .editor-container {
   max-width: 900px;
   margin: 50px auto;
-  margin-top: 70px;
-  padding: 24px;
-  background: #2c2c2c;
+  padding: 32px;
+  background: var(--bg-secondary);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px var(--shadow-color);
+  border: 1px solid var(--border-color);
 }
 
 .editor-container h1 {
   text-align: center;
-  color: #0cfbbb;
-  margin-bottom: 20px;
+  color: var(--accent-primary);
+  margin-bottom: 30px;
 }
 
-.editor-container input[type="text"] {
-  width: 97%;
+
+.editor-container input[type="text"],
+.editor-container textarea { 
+  width: 100%; 
   padding: 12px;
-  margin-bottom: 16px;
-  font-size: 1rem;
-  border: 1px solid #585858;
-  border-radius: 6px;
-  color: #dbdbdb;
-  background-color: #2c2c2c;
-}
-
-.editor-container input[type="file"] {
-  width:200px;
-  height: 20px;
   margin-bottom: 20px;
-  background-color: transparent;
-  padding: 3px;
-  border-radius: 5px;
-  
-}
-
-.editor-container #ab{
-  color: #a6a6a6;
-  
-}
-
-#toolbar {
-  border: 1px solid #5b5b5b;
-  border-radius: 6px 6px 0 0;
-  margin-bottom: 0;
-  color: #0cfbbb;
-  background-color: #0bbd8d;
-}
-
-#editor {
-  height: 300px;
-  background: #2c2c2c;
-  border: 1px solid #5b5b5b;
-  border-top: none;
-  border-radius: 0 0 6px 6px;
-  margin-bottom: 20px;
-}
-
-.ql-editor {
-  color: #b4b4b4;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
-
-#blogpost button[type="submit"] {
-  display: block;
-  margin: 0 auto;
-  padding: 12px 24px;
   font-size: 1rem;
-  background-color: #007acc;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  border: 1px solid var(--border-color);
+  border-radius: 8px; 
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; 
 }
 
-button[type="submit"]:hover {
-  background-color: rgb(6, 93, 70);
+
+.editor-container input[type="text"]:focus,
+.editor-container textarea:focus {
+  outline: none;
+  border-color: var(--border-focus-color);
+  box-shadow: 0 0 0 3px rgba(12, 251, 187, 0.2);
 }
 
-#ab {
+.editor-container label {
   display: block;
   margin-bottom: 8px;
   font-size: 16px;
-  color: #a6a6a6;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
-#thumbnail {
+.editor-container input[type="file"] {
   display: block;
   font-size: 14px;
-  color: #ccc;
-  background-color: #2c2c2c;
-  border: 1px solid #444;
-  border-radius: 6px;
+  color: var(--text-secondary);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   width: 100%;
-  max-width: 400px;
+  padding: 8px;
   cursor: pointer;
+  margin-bottom: 20px;
 }
 
-#thumbnail::-webkit-file-upload-button {
-  background: #007acc;
-  color: white;
+
+.editor-container input[type="file"]::file-selector-button {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  font-weight: bold;
   border: none;
-  border-radius: 4px;
+  padding: 8px 12px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 16px;
 }
 
-#thumbnail::-webkit-file-upload-button:hover {
-  background: #065e52;
+.editor-container input[type="file"]::file-selector-button:hover {
+  background: var(--accent-primary-hover);
 }
 
-#content{
-  height: 95%;
-  width:93%;
-  background-color: #2c2c2c;
-  border-radius: 10px;
-  color: #eeeeee;
-  padding: 30px;
+
+
+.ql-toolbar {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px 8px 0 0 !important;
 }
+
+.ql-container {
+  border: 1px solid var(--border-color) !important;
+  border-top: none !important;
+  border-radius: 0 0 8px 8px !important;
+  background: var(--bg-secondary);
+}
+
+/* Style the toolbar icons */
+.ql-snow .ql-stroke {
+  stroke: var(--text-secondary);
+}
+.ql-snow .ql-fill {
+  fill: var(--text-secondary);
+}
+.ql-snow .ql-picker-label {
+  color: var(--text-secondary);
+}
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke {
+  stroke: var(--accent-primary);
+}
+
+.ql-editor {
+  height: 350px;
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.ql-editor.ql-blank::before {
+  color: var(--text-secondary); 
+}
+
+.editor-container button[type="submit"] {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 20px auto 0 auto;
+  padding: 14px 24px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background-color: var(--accent-primary);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.editor-container button[type="submit"]:hover {
+  background-color: var(--accent-primary-hover);
+  transform: translateY(-2px);
+}
+
+.delete-button {
+   display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 20px auto 0 auto;
+  padding: 8px 16px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color:rgb(254, 79, 79);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  .delete-button:hover {
+    background-color:rgb(183, 51, 51);
+  transform: translateY(-2px);
+  }

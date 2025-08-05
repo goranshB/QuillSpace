@@ -1,50 +1,86 @@
 <%- include('partials/header') %>
 <%- include('partials/navbar') %>
 
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
 <div class="editor-container">
   <h1>Create Blog</h1>
-  <form id="blogpost" method="POST" action="/newblogpost" enctype="multipart/form-data">
+  <form id="blog-form" method="POST" action="/newblogpost" enctype="multipart/form-data">
     <input type="text" name="title" placeholder="Blog Title" required />
     <input type="text" name="discription" placeholder="Short Description" required />
+    
     <label id="ab" for="thumbnail">Upload Thumbnail</label>
     <input type="file" name="thumbnail" id="thumbnail" accept="image/*" onchange="previewImage(this)">
     <img id="thumbnailPreview" alt="Preview" style="display: none; max-width: 150px; margin-top: 5px; border-radius: 8px;margin-bottom: 10px;" />
 
-    <!-- <div id="editor">
-    </div> -->
-    <textarea name="content" id="content" rows="60" placeholder="Write your blog content here..." required></textarea>
+    <div id="toolbar-container">
+      <span class="ql-formats">
+        <select class="ql-header" defaultValue="0">
+          <option value="1">Heading 1</option>
+          <option value="2">Heading 2</option>
+          <option value="3">Heading 3</option>
+          <option value="0">Normal</option>
+        </select>
+        <select class="ql-font"></select>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-bold"></button>
+        <button class="ql-italic"></button>
+        <button class="ql-underline"></button>
+        <button class="ql-strike"></button>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-list" value="ordered"></button>
+        <button class="ql-list" value="bullet"></button>
+        <button class="ql-indent" value="-1"></button>
+        <button class="ql-indent" value="+1"></button>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-link"></button>
+        <button class="ql-image"></button>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-clean"></button>
+      </span>
+    </div>
 
+    <div id="editor">
+      <p>Start writing your masterpiece...</p>
+    </div>
+
+    <input type="hidden" name="content" id="hiddenContent">
 
     <button type="submit">Publish Blog</button>
   </form>
 </div>
 
-<!-- <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js"></script> -->
 
 <script>
-  // document.addEventListener("DOMContentLoaded", function () {
-  //   Quill.register('modules/imageResize', window.ImageResize);
+  document.addEventListener("DOMContentLoaded", function () {
+    const quill = new Quill('#editor', {
+      modules: {
+        toolbar: '#toolbar-container',
+        imageResize: {
+          modules: ['Resize', 'DisplaySize', 'Toolbar']
+        }
+      },
+      theme: 'snow', 
+      placeholder: 'Write your blog content here...'
+    });
 
-  //   const quill = new Quill('#editor', {
-  //     theme: 'snow',
-  //     modules: {
-  //       toolbar: '#toolbar',
-  //       imageResize: {
-  //         modules: ['Resize', 'DisplaySize', 'Toolbar']
-  //       }
-  //     }
-  //   });
-
-  // });
-
-  // function prepareContent() {
-  //   const html = quill.root.innerHTML;
-  //   console.log("📝 Quill content on submit:", html);
-  //   document.getElementById("hiddenContent").value = html;
-  //   return true;
-  // }
+    const form = document.getElementById('blog-form');
+    form.addEventListener('submit', function(event) {
+      const editorContent = quill.root.innerHTML;
+      if (quill.getLength() <= 1) {
+        alert('Blog content cannot be empty!');
+        event.preventDefault();
+        return;
+      }
+      
+      document.getElementById('hiddenContent').value = editorContent;
+    });
+  });
 
   function previewImage(input) {
     const preview = document.getElementById('thumbnailPreview');
@@ -58,6 +94,5 @@
     }
   }
 </script>
-
 
 <%- include('partials/footer') %>

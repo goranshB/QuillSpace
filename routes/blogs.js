@@ -3,8 +3,14 @@ import pool from "../db.js";
 import multer from "multer";
 import { supabase } from "../utils/supabaseClient.js";
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 15 * 1024 * 1024,  
+    fieldSize: 15 * 1024 * 1024, 
+  },
+});
 
 const router = express.Router();
 
@@ -142,6 +148,7 @@ router.get("/blog_page/:id", async (req, res) => {
       bookmarked = bookmarkCheck.rowCount > 0;
     }
 
+
     res.render("blog_view", {
       blog: result.rows[0],
       comments: commentsResult.rows,
@@ -244,5 +251,45 @@ router.post("/bookmark/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+
+
+router.post("/deleteblog/:id", async (req, res) => {
+  const blogId = req.params.id;
+  const userId = req.session.userId;
+
+  if (!userId) {
+    return res.status(401).json({ error: "You must be logged in to delete a blog." });
+  }
+
+  try {
+
+    const blogResult = await pool.query(
+      "SELECT author_id FROM blogs WHERE id = $1",
+      [blogId]
+    );
+
+    if (blogResult.rows.length === 0) {
+      return res.status(404).json({ error: "Blog not found." });
+    }
+
+    if (blogResult.rows[0].author_id !== userId) {
+      
+      return res.status(403).json({ error: "Forbidden: You can only delete your own blogs." });
+    }
+
+
+    await pool.query("DELETE FROM blogs WHERE id = $1", [blogId]);
+
+
+    res.status(200).json({ message: "Blog deleted successfully." });
+
+  } catch (err) {
+    console.error("💥 Error deleting blog:", err);
+    res.status(500).json({ error: "Server error occurred while deleting blog." });
+  }
+});
+
 
 export default router;

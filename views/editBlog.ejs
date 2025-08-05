@@ -1,64 +1,86 @@
 <%- include('partials/header') %>
 <%- include('partials/navbar') %>
 
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+
 <div class="editor-container">
   <h1>Edit Blog</h1>
-  <form id="blogpost" method="POST" action="/editblog/<%= blog.id %>" enctype="multipart/form-data" onsubmit="return prepareContent()">
+  
+  <form id="edit-form" method="POST" action="/editblog/<%= blog.id %>" enctype="multipart/form-data">
+    
     <input type="text" name="title" value="<%= blog.title %>" placeholder="Blog Title" required />
     <input type="text" name="discription" value="<%= blog.discription %>" placeholder="Short Description" required />
     
-    <label id="ab" for="thumbnail">Upload Thumbnail</label>
+    <label id="ab" for="thumbnail">Change Thumbnail</label>
     <input type="file" name="thumbnail" id="thumbnail" accept="image/*" onchange="previewImage(this)">
-    <img id="thumbnailPreview" src="<%= blog.thumbnail || '' %>" alt="Preview" style="display: 'block'; max-width: 150px; margin-top: 10px; border-radius: 8px;" />
+    <img id="thumbnailPreview" src="<%= blog.thumbnail || '' %>" alt="Thumbnail Preview" style="display: <%= blog.thumbnail ? 'block' : 'none' %>; max-width: 150px; margin-top: 10px; border-radius: 8px;" />
 
-    <!-- <div id="toolbar">
-      <select class="ql-header">
-        <option selected></option>
-        <option value="1">Heading 1</option>
-        <option value="2">Heading 2</option>
-      </select>
-      <button class="ql-bold"></button>
-      <button class="ql-italic"></button>
-      <button class="ql-underline"></button>
-      <button class="ql-strike"></button>
-      <button class="ql-link"></button>
-      <button class="ql-image"></button>
-      <button class="ql-video"></button>
-      <button class="ql-code-block"></button>
-      <button class="ql-list" value="ordered"></button>
-      <button class="ql-list" value="bullet"></button>
-      <button class="ql-clean"></button>
-    </div> -->
+    <div id="toolbar-container">
+      <span class="ql-formats">
+        <select class="ql-header" defaultValue="0"><option value="1">Heading 1</option><option value="2">Heading 2</option><option value="3">Heading 3</option><option value="0">Normal</option></select><select class="ql-font"></select>
+      </span>
+      <span class="ql-formats"><button class="ql-bold"></button><button class="ql-italic"></button><button class="ql-underline"></button><button class="ql-strike"></button></span>
+      <span class="ql-formats"><button class="ql-list" value="ordered"></button><button class="ql-list" value="bullet"></button><button class="ql-indent" value="-1"></button><button class="ql-indent" value="+1"></button></span>
+      <span class="ql-formats"><button class="ql-link"></button><button class="ql-image"></button><button class="ql-video"></button><button class="ql-code-block"></button></span>
+      <span class="ql-formats"><button class="ql-clean"></button></span>
+    </div>
 
-    <!-- <div id="editor"></div> -->
-    <textarea name="content" id="content" value rows="60" placeholder="Write your blog content here..." required><%= blog.content %></textarea>
+    <div id="editor"></div>
+    <input type="hidden" name="content" id="hiddenContent">
 
     <button type="submit">Update Blog</button>
   </form>
+
+  <button type="button" id="delete-btn" class="delete-button">Delete Blog</button>
 </div>
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js"></script>
 
 <script>
-  // Register modules
-  Quill.register('modules/imageResize', window.ImageResize);
+  document.addEventListener("DOMContentLoaded", function () {
+    const initialContent = <%- JSON.stringify(blog.content) %>;
 
-  // Initialize Quill
-  const quill = new Quill('#editor', {
-    theme: 'snow',
-    modules: {
-      toolbar: '#toolbar',
-      imageResize: {
-        modules: ['Resize', 'DisplaySize', 'Toolbar']
+    const quill = new Quill('#editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: '#toolbar-container',
+        imageResize: { modules: ['Resize', 'DisplaySize', 'Toolbar'] }
       }
-    }
-  });
+    });
 
-  function prepareContent() {
-    document.getElementById("hiddenContent").value = quill.root.innerHTML;
-    return true;
-  }
+    quill.root.innerHTML = initialContent;
+
+    const form = document.getElementById('edit-form');
+    form.addEventListener('submit', function(event) {
+      const editorContent = quill.root.innerHTML;
+      document.getElementById('hiddenContent').value = editorContent;
+    });
+
+   
+    const deleteBtn = document.getElementById('delete-btn');
+    deleteBtn.addEventListener('click', async function() {
+      if (confirm('Are you sure you want to permanently delete this blog post? This action cannot be undone.')) {
+        try {
+          const response = await fetch('/deleteblog/<%= blog.id %>', {
+            method: 'POST', 
+          });
+
+          if (response.ok) {
+            alert('Blog deleted successfully.');
+            window.location.href = '/home'; 
+          } else {
+            const data = await response.json();
+            alert(`Error: ${data.error || 'Could not delete blog.'}`);
+          }
+        } catch (err) {
+          console.error('Failed to delete blog:', err);
+          alert('An error occurred. Please try again.');
+        }
+      }
+    });
+  });
 
   function previewImage(input) {
     const preview = document.getElementById("thumbnailPreview");
